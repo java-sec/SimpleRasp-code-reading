@@ -2,7 +2,7 @@
 
 # 一、缘起
 
-在GitHub搜索RASP关键词搜索到的项目，
+在GitHub搜索RASP关键词搜索到的项目
 
 # 二、整体架构
 
@@ -17,7 +17,7 @@ Rasp Handler是SimpleRasp的核心概念，相对应的在annotations下定义�
 1. 定义一个类，在Class添加@RaspHandler注解，使用注解的参数声明要Hook的类、方法、参数，是否是构造方法之类的（因为用到的javassist库要区分成员方法还是构造方法）
 2. 在方法上添加@RaspBefore或者@RaspAfter，表示在被Hook的方法之前还是之后插入
 
-接下来来看handlers包下的几个已经实现的防御，这几个都比较简单移动，只看一个应该就懂了，可以看到这个方法在@RaspHandler上指定了要hook的方法是`org.apache.logging.log4j.core.net.JndiManager.lookup(String.class)`，要注入在这个方法之前的方法是handleBefore，因为JNDI注入必须得在连接之前拦截掉，只是方式比较简单粗暴（看了下其它的RASP的JNDI拦截似乎也是关键字包含，就是黑名单列表全一些...）：
+接下来来看handlers包下的几个已经实现的防御，这几个都比较简单易懂，只看一个应该就懂了，可以看到这个方法在@RaspHandler上指定了要hook的方法是`org.apache.logging.log4j.core.net.JndiManager.lookup(String.class)`，要注入在这个方法之前的方法是handleBefore，因为JNDI注入必须得在连接之前拦截掉，只是方式比较简单粗暴（看了下其它的RASP的JNDI拦截似乎也是关键字包含，就是黑名单列表全一些...）：
 
 ```java
 package com.simplerasp.handlers;
