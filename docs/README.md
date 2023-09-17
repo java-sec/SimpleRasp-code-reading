@@ -49,7 +49,7 @@ public class JndiManagerLookupHandler {
 }
 ```
 
-再来看一下@RaspAfter的例子，这个例子并不是很合适，只是这个after的想法值得探讨一下，比如它这里认为Runtime.exec可能就只是为了`cat /etc/passwd`，所以在我再before里不太好判断并且先执行一下也没什么大不了的（显然命令执行不属于），那么我就可以通过在返回的时候判断是否有敏感内容： 
+再来看一下@RaspAfter的例子，这个例子并不是很合适，只是这个after的想法值得探讨一下，比如它这里认为Runtime.exec可能就只是为了`cat /etc/passwd`，所以在我在before里不太好判断并且先执行一下也没什么大不了的（显然命令执行不属于），那么我就可以通过在返回的时候判断是否有敏感内容： 
 
 ```java
 package com.simplerasp.handlers;
