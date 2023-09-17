@@ -1,13 +1,20 @@
 package com.simplerasp;
 
-import javassist.*;
+import javassist.ClassPool;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.Modifier;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.Map;
 
+/**
+ * 用来注入Rasp的Handler的
+ */
 public class RaspTransformer implements ClassFileTransformer {
+
     private String className;
     private String methodName;
     private boolean isConstructor;
@@ -15,7 +22,6 @@ public class RaspTransformer implements ClassFileTransformer {
     private Map<String, String> handlerMap;
     private static final String beforeBody = "$args = %s.%s(%s,$args);";
     private static final String afterBody = "$_ = %s.%s(%s,$_);";
-
 
     public RaspTransformer(String className, String methodName, boolean isConstructor, Class[] parameterTypes) {
         this.className = className;
@@ -27,6 +33,7 @@ public class RaspTransformer implements ClassFileTransformer {
     public void setHandlerMap(Map<String, String> handlerMap) {
         this.handlerMap = handlerMap;
     }
+
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         // 匹配 className
@@ -38,7 +45,7 @@ public class RaspTransformer implements ClassFileTransformer {
 
                 // 将 parameterTypes 类型转换为 CtClass
                 CtClass[] ctParameterTypes = new CtClass[this.parameterTypes.length];
-                for (int i = 0; i < this.parameterTypes.length; i ++) {
+                for (int i = 0; i < this.parameterTypes.length; i++) {
                     ctParameterTypes[i] = pool.get(this.parameterTypes[i].getName());
                 }
 
@@ -46,12 +53,12 @@ public class RaspTransformer implements ClassFileTransformer {
                 CtBehavior ctBehavior = null;
 
                 if (this.isConstructor) {
-                   ctBehavior = ctClass.getDeclaredConstructor(ctParameterTypes);
+                    ctBehavior = ctClass.getDeclaredConstructor(ctParameterTypes);
                 } else {
                     ctBehavior = ctClass.getDeclaredMethod(this.methodName, ctParameterTypes);
                 }
 
-                // 修改字节码, 插入 handler
+                // 修改字节码, 插入handler的before方法
                 if (this.handlerMap.get("beforeName") != null) {
                     ctBehavior.insertBefore(String.format(beforeBody,
                             this.handlerMap.get("className"),
@@ -60,6 +67,7 @@ public class RaspTransformer implements ClassFileTransformer {
                     ));
                 }
 
+                // 修改字节码，插入handler的after方法
                 if (this.handlerMap.get("afterName") != null) {
                     ctBehavior.insertAfter(String.format(afterBody,
                             this.handlerMap.get("className"),
@@ -78,4 +86,5 @@ public class RaspTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
     }
+
 }

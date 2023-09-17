@@ -8,8 +8,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RaspHandler {
+
     String className();
+
     String methodName() default "";
+
     boolean isConstructor() default false;
+
     Class[] parameterTypes();
+    
 }

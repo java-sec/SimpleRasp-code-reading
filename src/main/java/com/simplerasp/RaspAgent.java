@@ -1,23 +1,35 @@
 package com.simplerasp;
+
 import com.simplerasp.annotations.RaspAfter;
 import com.simplerasp.annotations.RaspBefore;
 import com.simplerasp.annotations.RaspHandler;
 import org.reflections.Reflections;
-import org.reflections.scanners.*;
-import org.reflections.util.ConfigurationBuilder;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
 
+/**
+ * 整个rasp程序的入口
+ */
 public class RaspAgent {
+
+    /**
+     * jvm的-javaagent参数启动的时候执行的方法
+     *
+     * @param args
+     * @param inst
+     * @throws Exception
+     */
     public static void premain(String args, Instrumentation inst) throws Exception {
         System.out.println("premain");
 
+        // 哈，总算看到一个不是使用的openrasp的工具类来干这个事的了...
         // 解决双亲委派问题, 使得 Hook 使用 BootstrapClassLoader 加载的类时, 能够正常加载到我们自定义的 handler
         String jarPath = RaspAgent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         inst.appendToBootstrapClassLoaderSearch(new JarFile(jarPath));
@@ -63,6 +75,7 @@ public class RaspAgent {
             handlerMap.put("beforeName", beforeName);
             handlerMap.put("afterName", afterName);
 
+            // 我草不是吧兄弟？这活似乎有点糙？这岂不是意味着每多一个rasp handler都会把所有类retransform一次，要是handler多了这直接跑不动了啊...
             // 添加 transformer 并 retransform
             RaspTransformer transformer = new RaspTransformer(className, methodName, isConstructor, parameterTypes);
             transformer.setHandlerMap(handlerMap);
@@ -71,11 +84,19 @@ public class RaspAgent {
         }
     }
 
+    /**
+     * 看来是不支持attach模式的
+     *
+     * @param args
+     * @param inst
+     * @throws Exception
+     */
     public static void agentmain(String args, Instrumentation inst) throws Exception {
         System.out.println("agentmain");
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         System.out.println("main");
     }
+
 }

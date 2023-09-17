@@ -4,6 +4,9 @@ import com.simplerasp.annotations.RaspBefore;
 import com.simplerasp.annotations.RaspHandler;
 import com.simplerasp.exceptions.RaspException;
 
+/**
+ * 这个是用来防止jndi注入的
+ */
 @RaspHandler(className = "org.apache.logging.log4j.core.net.JndiManager", methodName = "lookup", parameterTypes = {String.class})
 public class JndiManagerLookupHandler {
 
@@ -20,4 +23,5 @@ public class JndiManagerLookupHandler {
         }
         return params;
     }
+
 }
