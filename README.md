@@ -1,5 +1,11 @@
 # SimpleRasp
 
+---
+
+# CC的代码阅读笔记： https://github.com/java-sec/SimpleRasp-code-reading/blob/main/docs/README.md
+
+---
+
 Simple Java Rasp
 
 基于 Java Instrumentation + Javaassist
